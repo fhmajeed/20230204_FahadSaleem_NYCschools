@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import co.jpmorgan.test.R
 import co.jpmorgan.test.adapters.SchoolListAdapter
 import co.jpmorgan.test.databinding.FragmentSchoolListBinding
 import co.jpmorgan.test.models.School
@@ -55,7 +56,9 @@ class SchoolListFragment : Fragment() {
                     binding.root,
                     error,
                     Snackbar.LENGTH_LONG
-                )
+                ).setAction(getString(R.string.retry)) {
+                    viewModel.getSchoolList()
+                }
                 snackBar.show()
             }
 

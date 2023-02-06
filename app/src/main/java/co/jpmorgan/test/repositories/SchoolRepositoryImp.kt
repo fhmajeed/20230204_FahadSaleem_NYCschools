@@ -12,16 +12,18 @@ class SchoolRepositoryImp @Inject constructor(private val schoolApi: SchoolApi) 
             val list: List<School> = schoolApi.getSchoolList()
             Result.Success(list)
         } catch (e: Exception) {
-            Result.Error(Exception("Error Processing Request =$e"))
+            println(e)
+            Result.Error(Exception("Network Error"))
         }
     }
 
     override suspend fun fetchSchoolDetail(dbn: String): Result<SchoolDetail> {
         return try {
-            val schoolDetail = schoolApi.getSchoolDetail(dbn)[0]
+            val schoolDetail = schoolApi.getSchoolDetail(dbn).first()
             Result.Success(schoolDetail)
         } catch (e: Exception) {
-            Result.Error(Exception("Error Processing Request =$e"))
+            println(e)
+            Result.Error(Exception("Network Error"))
         }
     }
 

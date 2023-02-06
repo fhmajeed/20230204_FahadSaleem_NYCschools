@@ -20,4 +20,6 @@
     <string name="sat_avg_writing">SAT Average Writing Score:</string>
     <string name="overview">Overview</string>
     <string name="list_of_schools">List Of Schools</string>
+    <string name="retry">Retry</string>
+
 </resources>

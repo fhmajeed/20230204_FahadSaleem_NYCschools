@@ -40,7 +40,7 @@ class SchoolDetailFragment : Fragment() {
         binding.apply {
             viewModel.schoolDetailLiveData.observe(viewLifecycleOwner) { schoolDetail: SchoolDetail? ->
                 schoolDetail?.let {
-                    val schoolName = getString(R.string.name) + schoolDetail.schoolName
+                    val schoolName = schoolDetail.schoolName
                     val avgReadScore = getString(R.string.sat_avg_reading) + schoolDetail.readingSATScore
                     val avgMathScore = getString(R.string.sat_avg_math) + schoolDetail.mathSATScore
                     val avgWriteScore = getString(R.string.sat_avg_writing) + schoolDetail.writingSATScore
@@ -54,12 +54,13 @@ class SchoolDetailFragment : Fragment() {
             viewModel.showProgress.observe(viewLifecycleOwner) { isInProgress ->
                 progressCircular.isGone = !isInProgress
             }
+
             viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
-                val snackBar = Snackbar.make(
-                    binding.root,
-                    error,
-                    Snackbar.LENGTH_LONG
-                )
+                val snackBar = Snackbar
+                    .make(binding.root, error, Snackbar.LENGTH_LONG)
+                    .setAction(getString(R.string.retry)) {
+                        viewModel.getSchoolDetail(args.dbn)
+                    }
                 snackBar.show()
             }
 
