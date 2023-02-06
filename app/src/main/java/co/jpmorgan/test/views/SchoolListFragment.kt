@@ -13,14 +13,14 @@ import co.jpmorgan.test.R
 import co.jpmorgan.test.adapters.SchoolListAdapter
 import co.jpmorgan.test.databinding.FragmentSchoolListBinding
 import co.jpmorgan.test.models.School
-import co.jpmorgan.test.viewmodels.SchoolListViewModel
+import co.jpmorgan.test.viewmodels.SchoolViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class SchoolListFragment : Fragment() {
 
-    private val viewModel: SchoolListViewModel by viewModels()
+    private val viewModel: SchoolViewModel by viewModels()
 
     private var _binding: FragmentSchoolListBinding? = null
 
