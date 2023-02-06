@@ -7,21 +7,21 @@ import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import co.jpmorgan.test.adapters.SchoolListAdapter
-import co.jpmorgan.test.databinding.FragmentSchoolListBinding
-import co.jpmorgan.test.models.School
+import androidx.navigation.fragment.navArgs
+import co.jpmorgan.test.R
+import co.jpmorgan.test.databinding.FragmentSchoolDetailBinding
+import co.jpmorgan.test.models.SchoolDetail
 import co.jpmorgan.test.viewmodels.SchoolListViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class SchoolListFragment : Fragment() {
+class SchoolDetailFragment : Fragment() {
 
     private val viewModel: SchoolListViewModel by viewModels()
+    private val args: SchoolDetailFragmentArgs by navArgs()
 
-    private var _binding: FragmentSchoolListBinding? = null
+    private var _binding: FragmentSchoolDetailBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
@@ -30,7 +30,7 @@ class SchoolListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentSchoolListBinding.inflate(inflater, container, false)
+        _binding = FragmentSchoolDetailBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -38,13 +38,17 @@ class SchoolListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.apply {
-
-            val schoolListAdapter = SchoolListAdapter { school -> adapterOnClick(school) }
-            recyclerView.adapter = schoolListAdapter
-            recyclerView.layoutManager = LinearLayoutManager(requireContext())
-
-            viewModel.listOfSchoolLiveData.observe(viewLifecycleOwner) { list ->
-                schoolListAdapter.submitList(list)
+            viewModel.schoolDetailLiveData.observe(viewLifecycleOwner) { schoolDetail: SchoolDetail? ->
+                schoolDetail?.let {
+                    val schoolName = getString(R.string.name) + schoolDetail.schoolName
+                    val avgReadScore = getString(R.string.sat_avg_reading) + schoolDetail.readingSATScore
+                    val avgMathScore = getString(R.string.sat_avg_math) + schoolDetail.mathSATScore
+                    val avgWriteScore = getString(R.string.sat_avg_writing) + schoolDetail.writingSATScore
+                    binding.schoolNameTV.text = schoolName
+                    binding.satAvgReadScoreTV.text = avgReadScore
+                    binding.satAvgMathScoreTV.text = avgMathScore
+                    binding.satAvgWritingScoreTV.text = avgWriteScore
+                }
             }
 
             viewModel.showProgress.observe(viewLifecycleOwner) { isInProgress ->
@@ -59,25 +63,12 @@ class SchoolListFragment : Fragment() {
                 snackBar.show()
             }
 
-            refresh.setOnRefreshListener {
-                viewModel.getSchoolList()
-                refresh.isRefreshing = false
-            }
-
+            viewModel.getSchoolDetail(args.dbn)
         }
-    }
-
-    /*
-     Opens SchoolDetailFragment when RecyclerView item is clicked.
-     */
-    private fun adapterOnClick(school: School) {
-        val action = SchoolListFragmentDirections.actionSchoolListFragmentToSchoolDetailFragment(school.dbn)
-        findNavController().navigate(action)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
-
 }

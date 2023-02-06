@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.jpmorgan.test.models.School
+import co.jpmorgan.test.models.SchoolDetail
 import co.jpmorgan.test.repositories.SchoolApi
 import co.jpmorgan.test.repositories.SchoolRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +17,9 @@ class SchoolListViewModel @Inject constructor(private val schoolRepository: Scho
 
     private val _listOfSchoolLiveData = MutableLiveData<List<School>?>()
     val listOfSchoolLiveData = _listOfSchoolLiveData
+
+    private val _schoolDetailLiveData = MutableLiveData<SchoolDetail?>()
+    val schoolDetailLiveData = _schoolDetailLiveData
 
     private val _showProgress = MutableLiveData<Boolean>()
     val showProgress = _showProgress
@@ -33,6 +37,21 @@ class SchoolListViewModel @Inject constructor(private val schoolRepository: Scho
             when (val result = schoolRepository.fetchSchoolList()) {
                 is Result.Success -> {
                     _listOfSchoolLiveData.postValue(result.data)
+                }
+                is Result.Error -> {
+                    _errorMessage.postValue(result.exception.toString())
+                }
+            }
+            _showProgress.postValue(false)
+        }
+    }
+
+    fun getSchoolDetail(dbn : String) {
+        viewModelScope.launch {
+            _showProgress.postValue(true)
+            when (val result = schoolRepository.fetchSchoolDetail(dbn = dbn)) {
+                is Result.Success -> {
+                    _schoolDetailLiveData.postValue(result.data)
                 }
                 is Result.Error -> {
                     _errorMessage.postValue(result.exception.toString())
