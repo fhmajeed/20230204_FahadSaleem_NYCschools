@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">JPMorganChaseTest</string>
+    <string name="name">School:</string>
+    <string name="error_message">Something went wrong on the server. No Data to display</string>
+    <string name="network_error">Please check your data connectivity …!!</string>
+    <string name="email_address">Email:</string>
+    <string name="school_detail">School Detail</string>
+    <string name="school_list">NYC Schools</string>
+    <string name="count_sort_asc">School Name Ascending</string>
+    <string name="count_sort_desc">School Name Descending</string>
+    <string name="phone">Phone #:</string>
+    <string name="office_hours">Office Hours:</string>
+    <string name="email">Email Address:</string>
+    <string name="website">Website</string>
+    <string name="total_student">Total Student:</string>
+    <string name="sat_stats">SAT Statistics</string>
+    <string name="sat_total">Total Sat Takers:</string>
+    <string name="sat_avg_reading">SAT Average Critical Reading Score:</string>
+    <string name="sat_avg_math">SAT Average Math Score:</string>
+    <string name="sat_avg_writing">SAT Average Writing Score:</string>
+    <string name="overview">Overview</string>
+    <string name="list_of_schools">List Of Schools</string>
+    <string name="retry">Retry</string>
+
 </resources>
