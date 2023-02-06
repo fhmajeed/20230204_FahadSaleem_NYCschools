@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.jpmorgan.test.models.School
 import co.jpmorgan.test.models.SchoolDetail
-import co.jpmorgan.test.repositories.SchoolApi
 import co.jpmorgan.test.repositories.SchoolRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -13,7 +12,7 @@ import javax.inject.Inject
 import co.jpmorgan.test.utils.Result
 
 @HiltViewModel
-class SchoolListViewModel @Inject constructor(private val schoolRepository: SchoolRepository) : ViewModel() {
+class SchoolViewModel @Inject constructor(private val schoolRepository: SchoolRepository) : ViewModel() {
 
     private val _listOfSchoolLiveData = MutableLiveData<List<School>?>()
     val listOfSchoolLiveData = _listOfSchoolLiveData

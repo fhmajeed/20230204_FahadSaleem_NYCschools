@@ -11,14 +11,14 @@ import androidx.navigation.fragment.navArgs
 import co.jpmorgan.test.R
 import co.jpmorgan.test.databinding.FragmentSchoolDetailBinding
 import co.jpmorgan.test.models.SchoolDetail
-import co.jpmorgan.test.viewmodels.SchoolListViewModel
+import co.jpmorgan.test.viewmodels.SchoolViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class SchoolDetailFragment : Fragment() {
 
-    private val viewModel: SchoolListViewModel by viewModels()
+    private val viewModel: SchoolViewModel by viewModels()
     private val args: SchoolDetailFragmentArgs by navArgs()
 
     private var _binding: FragmentSchoolDetailBinding? = null
