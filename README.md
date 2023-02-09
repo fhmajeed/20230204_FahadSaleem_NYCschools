@@ -6,6 +6,8 @@
 
 This is the test application given by JPMorgan Chase to evaluate my technical skills.
 
+![ChaseTestGif](https://user-images.githubusercontent.com/20050967/217733739-5752bf0c-91e0-4e76-b4f8-9ba5046085f3.gif)
+
 ## Getting Started
 
 ### Dependencies
