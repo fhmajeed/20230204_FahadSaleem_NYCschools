@@ -1,62 +1,88 @@
 package co.jpmorgan.test.viewmodels
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.jpmorgan.test.models.School
 import co.jpmorgan.test.models.SchoolDetail
 import co.jpmorgan.test.repositories.SchoolRepository
+import co.jpmorgan.test.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import co.jpmorgan.test.utils.Result
 
 @HiltViewModel
-class SchoolViewModel @Inject constructor(private val schoolRepository: SchoolRepository) : ViewModel() {
+class SchoolViewModel @Inject constructor(private val schoolRepository: SchoolRepository) :
+    ViewModel() {
 
-    private val _listOfSchoolLiveData = MutableLiveData<List<School>?>()
-    val listOfSchoolLiveData = _listOfSchoolLiveData
+    private val _schoolListState = MutableStateFlow(SchoolState<List<School>>())
+    val schoolState = _schoolListState.asStateFlow()
 
-    private val _schoolDetailLiveData = MutableLiveData<SchoolDetail?>()
-    val schoolDetailLiveData = _schoolDetailLiveData
+    private val _schoolDetailSate = MutableStateFlow(SchoolState<SchoolDetail>())
+    val schoolDetailSate = _schoolDetailSate.asStateFlow()
 
-    private val _showProgress = MutableLiveData<Boolean>()
-    val showProgress = _showProgress
-
-    private val _errorMessage = MutableLiveData<String>()
-    val errorMessage = _errorMessage
 
     init {
         getSchoolList()
     }
 
     fun getSchoolList() {
+        _schoolListState.update { currentValue ->
+            currentValue.copy(isLoading = true)
+        }
         viewModelScope.launch {
-            _showProgress.postValue(true)
             when (val result = schoolRepository.fetchSchoolList()) {
                 is Result.Success -> {
-                    _listOfSchoolLiveData.postValue(result.data)
+                    _schoolListState.update { currentValue ->
+                        currentValue.copy(
+                            data = result.data,
+                            isLoading = false
+                        )
+                    }
                 }
                 is Result.Error -> {
-                    _errorMessage.postValue(result.exception.toString())
+                    _schoolListState.update { currentValue ->
+                        currentValue.copy(
+                            error = result.exception.message.toString(),
+                            isLoading = false
+                        )
+                    }
                 }
             }
-            _showProgress.postValue(false)
         }
     }
 
-    fun getSchoolDetail(dbn : String) {
+    fun getSchoolDetail(dbn: String) {
+        _schoolDetailSate.update { currentValue ->
+            currentValue.copy(isLoading = true)
+        }
         viewModelScope.launch {
-            _showProgress.postValue(true)
             when (val result = schoolRepository.fetchSchoolDetail(dbn = dbn)) {
                 is Result.Success -> {
-                    _schoolDetailLiveData.postValue(result.data)
+                    _schoolDetailSate.update { currentValue ->
+                        currentValue.copy(
+                            data = result.data,
+                            isLoading = false
+                        )
+                    }
                 }
                 is Result.Error -> {
-                    _errorMessage.postValue(result.exception.toString())
+                    _schoolDetailSate.update { currentValue ->
+                        currentValue.copy(
+                            error = result.exception.message.toString(),
+                            isLoading = false
+                        )
+                    }
                 }
             }
-            _showProgress.postValue(false)
         }
     }
 }
+
+data class SchoolState<out T : Any>(
+    val data: T? = null,
+    val isLoading: Boolean = false,
+    val error: String = ""
+)

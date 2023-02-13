@@ -30,7 +30,7 @@ class NetworkModule {
             .setLenient()
             .create()
 
-        return Retrofit.Builder().baseUrl(Constants.BASE_URL)
+        return Retrofit.Builder().baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .client(okHttpBuilder.build())
             .build()
@@ -40,5 +40,9 @@ class NetworkModule {
     @Provides
     fun providesSchoolApi(retrofit: Retrofit): SchoolApi {
         return retrofit.create(SchoolApi::class.java)
+    }
+
+    companion object {
+        private const val BASE_URL = "https://data.cityofnewyork.us/resource/"
     }
 }

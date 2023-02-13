@@ -4,16 +4,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
 import co.jpmorgan.test.R
 import co.jpmorgan.test.databinding.FragmentSchoolDetailBinding
-import co.jpmorgan.test.models.SchoolDetail
 import co.jpmorgan.test.viewmodels.SchoolViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SchoolDetailFragment : Fragment() {
@@ -38,34 +43,54 @@ class SchoolDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.apply {
-            viewModel.schoolDetailLiveData.observe(viewLifecycleOwner) { schoolDetail: SchoolDetail? ->
-                schoolDetail?.let {
-                    val schoolName = schoolDetail.schoolName
-                    val avgReadScore = getString(R.string.sat_avg_reading) + schoolDetail.readingSATScore
-                    val avgMathScore = getString(R.string.sat_avg_math) + schoolDetail.mathSATScore
-                    val avgWriteScore = getString(R.string.sat_avg_writing) + schoolDetail.writingSATScore
-                    binding.schoolNameTV.text = schoolName
-                    binding.satAvgReadScoreTV.text = avgReadScore
-                    binding.satAvgMathScoreTV.text = avgMathScore
-                    binding.satAvgWritingScoreTV.text = avgWriteScore
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    launch {
+                        viewModel.schoolDetailSate.collectLatest { state ->
+                            if(state.error.isNotEmpty()) showError(state.error)
+                            progressCircular.isGone = !state.isLoading
+                            state.data?.run {
+                                val schoolName = schoolName
+                                val avgReadScore =
+                                    getString(R.string.sat_avg_reading) + readingSATScore
+                                val avgMathScore =
+                                    getString(R.string.sat_avg_math) + mathSATScore
+                                val avgWriteScore =
+                                    getString(R.string.sat_avg_writing) + writingSATScore
+                                binding.schoolNameTV.text = schoolName
+                                binding.satAvgReadScoreTV.text = avgReadScore
+                                binding.satAvgMathScoreTV.text = avgMathScore
+                                binding.satAvgWritingScoreTV.text = avgWriteScore
+                            }
+                        }
+                    }
+                    launch {
+                        viewModel.schoolState.collectLatest {
+                            if(savedInstanceState == null) {
+                                it.data?.let { list ->
+                                    Toast.makeText(context,"Retrieving school list of = ${list.size}",Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    }
                 }
             }
-
-            viewModel.showProgress.observe(viewLifecycleOwner) { isInProgress ->
-                progressCircular.isGone = !isInProgress
+            //savedInstanceState cannot be null upon orientation, so check upon call.
+            if(savedInstanceState == null ){
+                viewModel.getSchoolDetail(args.dbn)
             }
+        }
+    }
 
-            viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
-                val snackBar = Snackbar
-                    .make(binding.root, error, Snackbar.LENGTH_LONG)
-                    .setAction(getString(R.string.retry)) {
-                        viewModel.getSchoolDetail(args.dbn)
-                    }
-                snackBar.show()
-            }
-
+    private fun showError(string: String) {
+        val snackBar = Snackbar.make(
+            binding.root,
+            string,
+            Snackbar.LENGTH_LONG
+        ).setAction(getString(R.string.retry)) {
             viewModel.getSchoolDetail(args.dbn)
         }
+        snackBar.show()
     }
 
     override fun onDestroyView() {
